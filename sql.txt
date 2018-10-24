@@ -1,0 +1,51 @@
+1)
+
+select top 1 *
+from SalesLT.SalesOrderHeader
+order by SalesLT.SalesOrderHeader.TotalDue desc
+
+select *
+
+from SalesLT.SalesOrderHeader
+where SalesLT.SalesOrderHeader.TotalDue in
+(select top 1 SalesLT.SalesOrderHeader.TotalDue
+from SalesLT.SalesOrderHeader
+order by SalesLT.SalesOrderHeader.TotalDue desc)
+
+
+
+2)
+SELECT c.customerID, c.FirstName, c.MiddleName, c.LastName,
+d.OrderQty
+FROM SalesLT.Customer c join SalesLT.SalesOrderHeader s
+    ON (c.customerID=s.customerID)
+join SalesLT.SalesOrderDetail d
+    ON (s.salesorderID=d.salesorderID)
+WHERE d.OrderQty < 20
+
+
+SELECT a.CustomerID, a.FirstName,  a.LastName,a.MiddleName, c.OrderQty
+FROM SalesLT.Customer a INNER JOIN SalesLT.SalesOrderHeader b
+    ON (a.CustomerID=b.CustomerID)
+INNER JOIN SalesLT.SalesOrderDetail c
+    ON (b.SalesOrderID=c.SalesOrderID)
+WHERE c.OrderQty IN 
+        (SELECT OrderQty
+        FROM SalesLT.SalesOrderDetail
+        WHERE OrderQty < 20)
+
+
+3)
+
+SELECT  b.City, DATEPART(YEAR,a.DueDate) AS Year, DATEPART(MONTH,a.DueDate) AS Month, sum(a.TotalDue) AS Total_Summa
+FROM SalesLT.SalesOrderHeader a inner join SalesLt.Address b on (a.BillToAddressID = b.AddressID)
+GROUP BY b.City, a.TotalDue, a.DueDate
+
+4)
+SELECT a.ShipMethod, a.PurchaseOrderNumber, a.DueDate, a.TotalDue
+FROM SalesLT.SalesOrderHeader a
+WHERE TotalDue IN(SELECT max(b.TotalDue)
+FROM SalesLT.SalesOrderHeader b)
+GROUP BY a.ShipMethod, a.PurchaseOrderNumber, a.DueDate, a.TotalDue
+
+
